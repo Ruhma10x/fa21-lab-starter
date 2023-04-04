@@ -20,6 +20,7 @@ main:
     # If we wanted to be rigorous, we would add checks for
     # s2-s10 as well
     li s11, 134
+    
     # Now, we call some functions
     # simple_fn: should return 1
     jal simple_fn # Shorthand for "jal ra, simple_fn"
@@ -55,6 +56,7 @@ main:
 # FIXME Fix the reported error in this function (you can delete lines
 # if necessary, as long as the function still returns 1 in a0).
 simple_fn:
+    li t0,4
     mv a0, t0
     li a0, 1
     ret
@@ -76,8 +78,11 @@ simple_fn:
 # missing. Another hint: what does the "s" in "s0" stand for?
 naive_pow:
     # BEGIN PROLOGUE
-    # END PROLOGUE
+    addi sp,sp,-4
+    sw s0,0(sp)
+    # END PROLOGUE  
     li s0, 1
+   
 naive_pow_loop:
     beq a1, zero, naive_pow_end
     mul s0, s0, a0
@@ -86,8 +91,12 @@ naive_pow_loop:
 naive_pow_end:
     mv a0, s0
     # BEGIN EPILOGUE
-    # END EPILOGUE
+    lw s0,0(sp)
+    addi sp,sp,4
     ret
+    
+    # END EPILOGUE
+    
 
 # Increments the elements of an array in-place.
 # a0 holds the address of the start of the array, and a1 holds
@@ -98,8 +107,14 @@ naive_pow_end:
 inc_arr:
     # BEGIN PROLOGUE
     # FIXME What other registers need to be saved?
-    addi sp, sp, -4
+    addi sp, sp, -12
+    
+    
     sw ra, 0(sp)
+    #addi sp,sp,-8
+    sw s0, 4(sp)
+    
+    sw s1, 8(sp)
     # END PROLOGUE
     mv s0, a0 # Copy start of array to saved register
     mv s1, a1 # Copy length of array to saved register
@@ -114,15 +129,31 @@ inc_arr_loop:
     # Hint: What does the "t" in "t0" stand for?
     # Also ask yourself this: why don't we need to preserve t1?
     #
+    addi sp,sp,-4
+    sw t0, 0(sp)
+    
+    
     jal helper_fn
+    
+    lw t0,0(sp)
+    addi sp,sp,4
     # Finished call for helper_fn
     addi t0, t0, 1 # Increment counter
     j inc_arr_loop
 inc_arr_end:
     # BEGIN EPILOGUE
-    lw ra, 0(sp)
-    addi sp, sp, 4
+    
+    
+   lw ra, 0(sp)
+    
+    lw s0, 4(sp)
+    
+    lw s1, 8(sp)
+    addi sp,sp,12
+    
     # END EPILOGUE
+    
+    
     ret
 
 # This helper function adds 1 to the value at the memory address in a0.
@@ -135,11 +166,17 @@ inc_arr_end:
 # as appropriate.
 helper_fn:
     # BEGIN PROLOGUE
+    addi sp,sp,-4
+    sw s0,0(sp)
     # END PROLOGUE
+    
     lw t1, 0(a0)
     addi s0, t1, 1
     sw s0, 0(a0)
     # BEGIN EPILOGUE
+    lw s0,0(sp)
+    addi sp,sp,4
+    
     # END EPILOGUE
     ret
 
