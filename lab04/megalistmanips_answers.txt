@@ -1,6 +1,6 @@
-1.
-2.
-3.
-4.
-5.
-6.
+1. Changed add t1, s0, x0 to lw t1, 0(s0) since we need to load the address of the array which is in the data present at the address of the node i.e. s0
+2. shift left slli t5,t0,2 since we require the offset in bytes
+3. In three, we stored the value of t1 on the stack as it is being changed in the function and loaded it after returning.
+4. Changed la a0, 8(s0) to lw a0, 8(s0) since we need the word present on that address, not the address itself.
+5. Changed lw a1, 0(s1) to add a1,x0,s1 as we need to put the address in a1, not the word.
+6. Returned from done using jr ra to return so that it doesn't move to the printline function and then return.
